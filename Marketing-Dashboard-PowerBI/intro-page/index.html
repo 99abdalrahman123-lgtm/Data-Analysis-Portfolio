@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketing Campaign Performance · Eldatawy Data Wizard</title>
+<style>
+  /* ===== Eldatawy · Data Wizard Design System ===== */
+  :root{
+    --black:#00010A; --abyss:#00071A; --navy:#01122A; --navy-panel:#001A38; --navy-soft:#022140;
+    --ocean:#013760; --deep-blue:#004979; --royal:#0071BF; --blue:#0091DC; --electric:#00ABEF;
+    --azure:#00D1F3; --cyan:#04FBFE; --aqua:#39F9FC; --ice:#6FFAFC; --frost:#91FDFD; --mist:#CDFAFC; --white:#FFFFFF;
+    /* roles */
+    --bg:var(--navy); --surface:var(--navy-panel); --primary:var(--cyan); --secondary:var(--electric);
+    --accent:var(--frost); --text:var(--white); --text-on-primary:var(--abyss); --shadow:var(--black);
+    --radius-lg:24px; --radius-md:16px; --radius-sm:10px;
+    --font:"Segoe UI","Segoe UI Web",Tahoma,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:var(--font);background:var(--abyss);color:var(--text);overflow-x:hidden;line-height:1.5}
+  [dir="rtl"] body{font-family:"Segoe UI",Tahoma,"Arial",sans-serif}
+  #net{position:fixed;inset:0;z-index:0;pointer-events:none}
+  .glow{position:fixed;border-radius:50%;filter:blur(90px);z-index:0;pointer-events:none}
+  .glow.a{width:520px;height:520px;background:var(--deep-blue);top:-180px;left:-160px;opacity:.55}
+  .glow.b{width:560px;height:560px;background:var(--ocean);bottom:-220px;right:-160px;opacity:.7}
+  .shell{position:relative;z-index:1;display:grid;grid-template-columns:84px 1fr;min-height:100vh;padding:14px 18px 14px 0}
+  [dir="rtl"] .shell{padding:14px 0 14px 18px}
+
+  /* ---- side rail ---- */
+  .rail{display:flex;flex-direction:column;align-items:center;gap:14px;padding-top:6px}
+  .logo{width:46px;height:46px;border-radius:50%;border:2px solid var(--cyan);display:grid;place-items:center;
+        background:var(--navy);box-shadow:0 0 18px rgba(4,251,254,.45)}
+  .brand{font-size:9px;font-weight:700;letter-spacing:.12em;color:var(--frost);margin-bottom:46px}
+  .tile{width:50px;height:50px;border-radius:15px;display:grid;place-items:center;background:var(--navy-soft);
+        border:1px solid var(--ocean);color:var(--electric);cursor:pointer;transition:.25s;position:relative;text-decoration:none}
+  .tile:hover{border-color:var(--cyan);color:var(--cyan);transform:translateY(-2px)}
+  .tile.active{background:var(--cyan);color:var(--abyss);box-shadow:0 0 22px rgba(4,251,254,.55)}
+  .tile svg{width:22px;height:22px}
+  .tile .tip{position:absolute;left:62px;white-space:nowrap;background:var(--abyss);border:1px solid var(--cyan);
+        color:var(--mist);font-size:12px;padding:5px 10px;border-radius:8px;opacity:0;pointer-events:none;transition:.2s}
+  [dir="rtl"] .tile .tip{left:auto;right:62px}
+  .tile:hover .tip{opacity:1}
+
+  /* ---- main container ---- */
+  .main{background:var(--bg);border:1px solid var(--ocean);border-radius:30px;padding:30px 40px 26px;position:relative;
+        overflow:hidden;box-shadow:0 0 0 1px rgba(4,251,254,.04),0 30px 80px rgba(0,1,10,.7)}
+  .main::before{content:"";position:absolute;top:0;left:8%;width:50%;height:2px;
+        background:linear-gradient(90deg,transparent,var(--cyan),transparent)}
+  .topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+  .kicker{color:var(--cyan);font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase}
+  .actions{display:flex;gap:10px;align-items:center}
+  .pill{background:var(--navy-soft);border:1px solid var(--royal);color:var(--white);border-radius:999px;padding:7px 16px;
+        font-size:13px;cursor:pointer;transition:.2s;font-family:inherit}
+  .pill:hover{border-color:var(--cyan);color:var(--cyan)}
+  .pill.on{background:var(--cyan);color:var(--abyss);border-color:var(--cyan);font-weight:700}
+  .clock{color:var(--electric);font-size:12px}
+
+  h1{font-size:clamp(34px,5vw,60px);line-height:1.08;margin:18px 0 14px;font-weight:800;letter-spacing:-.02em}
+  h1 .hl{color:var(--cyan);text-shadow:0 0 28px rgba(4,251,254,.35)}
+  .lead{color:var(--mist);font-size:17px;max-width:720px}
+  .typed{color:var(--frost);font-weight:600;border-inline-end:2px solid var(--cyan);padding-inline-end:4px;
+         animation:caret 1s steps(1) infinite}
+  @keyframes caret{50%{border-color:transparent}}
+
+  /* ---- dashboard cards ---- */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px;margin-top:30px}
+  .card{background:var(--surface);border:1px solid var(--royal);border-radius:var(--radius-lg);padding:26px;position:relative;
+        transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s,border-color .35s;cursor:pointer;
+        opacity:0;transform:translateY(24px);text-decoration:none;color:inherit;display:block;overflow:hidden}
+  .card.in{opacity:1;transform:none}
+  .card:hover{border-color:var(--cyan);box-shadow:0 0 0 1px var(--cyan),0 18px 50px rgba(4,251,254,.18);transform:translateY(-4px)}
+  .card .spot{position:absolute;width:280px;height:280px;border-radius:50%;pointer-events:none;
+        background:radial-gradient(circle,rgba(4,251,254,.16),transparent 65%);transform:translate(-50%,-50%);opacity:0;transition:opacity .3s}
+  .card:hover .spot{opacity:1}
+  .card-head{display:flex;gap:16px;align-items:center}
+  .icon{width:56px;height:56px;border-radius:16px;background:var(--cyan);color:var(--abyss);display:grid;place-items:center;flex:none;
+        box-shadow:0 0 20px rgba(4,251,254,.4)}
+  .icon svg{width:26px;height:26px}
+  .eyebrow{color:var(--electric);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+  .card h2{font-size:24px;line-height:1.2}
+  .card ul{list-style:none;margin:20px 0 22px;display:grid;gap:9px}
+  .card li{color:var(--mist);font-size:15px;display:flex;gap:10px;align-items:flex-start}
+  .card li::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--cyan);margin-top:8px;flex:none;
+        box-shadow:0 0 8px var(--cyan)}
+  .meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+  .chip{font-size:12px;color:var(--frost);background:var(--navy-soft);border:1px solid var(--ocean);border-radius:999px;padding:3px 10px}
+  .cta{display:inline-flex;gap:10px;align-items:center;background:var(--navy-soft);border:1px solid var(--cyan);color:var(--cyan);
+        border-radius:999px;padding:10px 22px;font-weight:700;font-size:14px;transition:.25s}
+  .card:hover .cta{background:var(--cyan);color:var(--abyss)}
+  .cta .arr{transition:transform .25s}
+  .card:hover .cta .arr{transform:translateX(5px)}
+  [dir="rtl"] .cta .arr{transform:scaleX(-1)}
+  [dir="rtl"] .card:hover .cta .arr{transform:scaleX(-1) translateX(5px)}
+  .key{font-size:11px;color:var(--electric);margin-inline-start:12px}
+
+  /* ---- stats ---- */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:22px}
+  .stat{background:var(--navy-soft);border:1px solid var(--ocean);border-radius:var(--radius-md);padding:16px 20px;display:flex;
+        align-items:center;gap:16px}
+  .stat b{font-size:34px;color:var(--cyan);min-width:54px;font-weight:800}
+  .stat span{color:var(--mist);font-size:14px}
+
+  /* ---- how to + palette ---- */
+  .row{display:grid;grid-template-columns:1.3fr 1fr;gap:22px;margin-top:22px}
+  @media(max-width:980px){.row{grid-template-columns:1fr}.shell{grid-template-columns:1fr}.rail{flex-direction:row;justify-content:center}.brand{margin:0}}
+  .panel{background:var(--surface);border:1px solid var(--ocean);border-radius:var(--radius-lg);padding:20px 22px}
+  .panel h3{font-size:15px;color:var(--cyan);margin-bottom:12px;letter-spacing:.04em}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .step{border-inline-start:2px solid var(--royal);padding-inline-start:12px}
+  .step i{font-style:normal;color:var(--electric);font-size:12px;font-weight:700}
+  .step p{color:var(--mist);font-size:13.5px}
+  .swatches{display:grid;grid-template-columns:repeat(9,1fr);gap:6px}
+  .sw{height:34px;border-radius:8px;border:1px solid rgba(255,255,255,.12);cursor:pointer;position:relative;transition:transform .2s}
+  .sw:hover{transform:translateY(-3px)}
+  .swname{margin-top:10px;color:var(--mist);font-size:12.5px;min-height:18px}
+  footer{margin-top:22px;display:flex;justify-content:space-between;color:var(--electric);font-size:12px;flex-wrap:wrap;gap:8px}
+  footer b{color:var(--frost)}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,30px);background:var(--abyss);border:1px solid var(--cyan);
+        color:var(--mist);padding:12px 18px;border-radius:12px;font-size:14px;opacity:0;transition:.3s;z-index:9;max-width:90vw}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.card{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<canvas id="net" aria-hidden="true"></canvas>
+<div class="glow a"></div><div class="glow b"></div>
+
+<div class="shell">
+  <!-- Side navigation -->
+  <nav class="rail" aria-label="Dashboard navigation">
+    <div class="logo" title="Eldatawy · Data Wizard">
+      <svg width="24" height="24" viewBox="0 0 24 24"><rect x="3" y="13" width="4" height="8" rx="1" fill="#0071BF"/><rect x="10" y="9" width="4" height="12" rx="1" fill="#00ABEF"/><rect x="17" y="4" width="4" height="17" rx="1" fill="#04FBFE"/></svg>
+    </div>
+    <div class="brand">ELDATAWY</div>
+    <a class="tile active" data-page="intro" aria-label="Intro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/></svg><span class="tip" data-i18n="navIntro">Intro</span></a>
+    <a class="tile" data-page="executive" aria-label="Executive Overview"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="13" width="4" height="8"/><rect x="10" y="8" width="4" height="13"/><rect x="17" y="3" width="4" height="18"/></svg><span class="tip" data-i18n="navExec">Executive Overview</span></a>
+    <a class="tile" data-page="deepdive" aria-label="Company Deep-Dive"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="10" cy="10" r="6.5"/><path d="m15 15 6 6"/></svg><span class="tip" data-i18n="navDeep">Company &amp; Campaign Deep-Dive</span></a>
+  </nav>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="kicker" data-i18n="kicker">Marketing Campaign Performance</div>
+      <div class="actions">
+        <span class="clock" id="clock"></span>
+        <button class="pill on" id="btnEN" type="button">EN</button>
+        <button class="pill" id="btnAR" type="button">عربي</button>
+      </div>
+    </div>
+
+    <h1><span data-i18n="h1a">Turn campaign data</span><br><span class="hl" data-i18n="h1b">into decisions.</span></h1>
+    <p class="lead"><span data-i18n="lead">Two dashboards, one story — built for</span> <span class="typed" id="typed"></span></p>
+
+    <section class="cards">
+      <a class="card" data-page="executive" tabindex="0">
+        <span class="spot"></span>
+        <div class="card-head">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="13" width="4" height="8"/><rect x="10" y="8" width="4" height="13"/><rect x="17" y="3" width="4" height="18"/></svg></div>
+          <div><div class="eyebrow" data-i18n="c1eyebrow">01 · For leadership</div><h2 data-i18n="c1title">Executive Overview</h2></div>
+        </div>
+        <ul>
+          <li data-i18n="c1l1">Total spend, revenue, ROI, conversions, CTR and CPC at a glance</li>
+          <li data-i18n="c1l2">Monthly spend vs. ROI — does more budget mean more return?</li>
+          <li data-i18n="c1l3">Budget split by campaign type and a conversions decomposition tree</li>
+          <li data-i18n="c1l4">ROI by city, CTR by channel and the Impressions → Clicks → Conversions funnel</li>
+        </ul>
+        <div class="meta"><span class="chip" data-i18n="chip6k">6 KPIs</span><span class="chip" data-i18n="chip6v">6 visuals</span><span class="chip" data-i18n="chipC">C-Level</span></div>
+        <span class="cta"><span data-i18n="open">Open dashboard</span><span class="arr">→</span></span><span class="key" data-i18n="key1">or press 1</span>
+      </a>
+
+      <a class="card" data-page="deepdive" tabindex="0">
+        <span class="spot"></span>
+        <div class="card-head">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="10" cy="10" r="6.5"/><path d="m15 15 6 6"/></svg></div>
+          <div><div class="eyebrow" data-i18n="c2eyebrow">02 · For campaign teams</div><h2 data-i18n="c2title">Company &amp; Campaign Deep-Dive</h2></div>
+        </div>
+        <ul>
+          <li data-i18n="c2l1">Company slicer filters every visual on the page</li>
+          <li data-i18n="c2l2">Cost vs. conversion scatter — spot winning and losing campaigns instantly</li>
+          <li data-i18n="c2l3">Performance matrix with colour bars, cost tiers and audience engagement</li>
+          <li data-i18n="c2l4">Language × segment heatmap and monthly engagement vs. conversion trend</li>
+        </ul>
+        <div class="meta"><span class="chip" data-i18n="chip6k">6 KPIs</span><span class="chip" data-i18n="chip6v">6 visuals</span><span class="chip" data-i18n="chipO">Operations</span></div>
+        <span class="cta"><span data-i18n="open">Open dashboard</span><span class="arr">→</span></span><span class="key" data-i18n="key2">or press 2</span>
+      </a>
+    </section>
+
+    <section class="stats">
+      <div class="stat"><b data-count="6">0</b><span data-i18n="s1">Executive KPIs</span></div>
+      <div class="stat"><b data-count="6">0</b><span data-i18n="s2">Operational KPIs</span></div>
+      <div class="stat"><b data-count="12">0</b><span data-i18n="s3">Interactive visuals</span></div>
+      <div class="stat"><b data-count="5">0</b><span data-i18n="s4">Slicers &amp; filters</span></div>
+    </section>
+
+    <section class="row">
+      <div class="panel">
+        <h3 data-i18n="howTitle">HOW TO READ THE DASHBOARDS</h3>
+        <div class="steps">
+          <div class="step"><i>01</i><p data-i18n="h1">Use the slicers at the top to set period, campaign type or company.</p></div>
+          <div class="step"><i>02</i><p data-i18n="h2">Hover any visual for a rich tooltip with spend, ROI, CTR and conversions.</p></div>
+          <div class="step"><i>03</i><p data-i18n="h3">Click a bar or slice to cross-filter the page; use Reset to clear.</p></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3 data-i18n="palTitle">DESIGN SYSTEM · ELDATAWY</h3>
+        <div class="swatches" id="swatches"></div>
+        <div class="swname" id="swname" data-i18n="palHint">Hover a colour to see its token.</div>
+      </div>
+    </section>
+
+    <footer>
+      <span><b>Eldatawy</b> · Data Wizard</span>
+      <span data-i18n="foot">Power BI · Marketing Campaign Performance</span>
+    </footer>
+  </main>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ============================================================
+   CONFIG — paste your Power BI page links here.
+   In Power BI Service: open the report, go to the page, copy the
+   browser URL (…/reports/<report-id>/<page-name>).
+   ============================================================ */
+const CONFIG = {
+  pages: {
+    intro:     "",   // Page 2 link (optional)
+    executive: "",   // Page 3 · Executive Overview
+    deepdive:  ""    // Page 4 · Company & Campaign Deep-Dive
+  },
+  openInNewTab: false
+};
+
+const I18N = {
+  en: {
+    kicker:"Marketing Campaign Performance", h1a:"Turn campaign data", h1b:"into decisions.",
+    lead:"Two dashboards, one story — built for", open:"Open dashboard", key1:"or press 1", key2:"or press 2",
+    c1eyebrow:"01 · For leadership", c1title:"Executive Overview",
+    c1l1:"Total spend, revenue, ROI, conversions, CTR and CPC at a glance",
+    c1l2:"Monthly spend vs. ROI — does more budget mean more return?",
+    c1l3:"Budget split by campaign type and a conversions decomposition tree",
+    c1l4:"ROI by city, CTR by channel and the Impressions → Clicks → Conversions funnel",
+    c2eyebrow:"02 · For campaign teams", c2title:"Company & Campaign Deep-Dive",
+    c2l1:"Company slicer filters every visual on the page",
+    c2l2:"Cost vs. conversion scatter — spot winning and losing campaigns instantly",
+    c2l3:"Performance matrix with colour bars, cost tiers and audience engagement",
+    c2l4:"Language × segment heatmap and monthly engagement vs. conversion trend",
+    chip6k:"6 KPIs", chip6v:"6 visuals", chipC:"C-Level", chipO:"Operations",
+    s1:"Executive KPIs", s2:"Operational KPIs", s3:"Interactive visuals", s4:"Slicers & filters",
+    howTitle:"HOW TO READ THE DASHBOARDS",
+    h1:"Use the slicers at the top to set period, campaign type or company.",
+    h2:"Hover any visual for a rich tooltip with spend, ROI, CTR and conversions.",
+    h3:"Click a bar or slice to cross-filter the page; use Reset to clear.",
+    palTitle:"DESIGN SYSTEM · ELDATAWY", palHint:"Hover a colour to see its token.",
+    foot:"Power BI · Marketing Campaign Performance",
+    navIntro:"Intro", navExec:"Executive Overview", navDeep:"Company & Campaign Deep-Dive",
+    typed:["senior leadership.","campaign managers.","faster decisions."],
+    noLink:"Add this page's Power BI link in the CONFIG block at the top of the script.", copied:"Copied "
+  },
+  ar: {
+    kicker:"أداء الحملات التسويقية", h1a:"حوّل بيانات الحملات", h1b:"إلى قرارات.",
+    lead:"داشبوردين، قصة واحدة — معمولة لـ", open:"افتح الداشبورد", key1:"أو اضغط 1", key2:"أو اضغط 2",
+    c1eyebrow:"01 · للإدارة العليا", c1title:"الملخص التنفيذي",
+    c1l1:"إجمالي الإنفاق والإيرادات والعائد والتحويلات و CTR و CPC في نظرة واحدة",
+    c1l2:"الإنفاق الشهري مقابل العائد — هل زيادة الميزانية بتزود العائد؟",
+    c1l3:"توزيع الميزانية حسب نوع الحملة وشجرة تحليل التحويلات",
+    c1l4:"العائد حسب المدينة و CTR حسب القناة وقمع الظهور ← النقرات ← التحويلات",
+    c2eyebrow:"02 · لفرق الحملات", c2title:"التحليل التفصيلي للشركات والحملات",
+    c2l1:"فلتر الشركة بيفلتر كل عناصر الصفحة",
+    c2l2:"مخطط التكلفة مقابل التحويل — اكتشف الحملات الرابحة والخاسرة فوراً",
+    c2l3:"مصفوفة أداء بأشرطة ألوان، فئات التكلفة وتفاعل الجمهور",
+    c2l4:"خريطة حرارية للغة × الشريحة واتجاه التفاعل مقابل التحويل شهرياً",
+    chip6k:"6 مؤشرات", chip6v:"6 رسوم", chipC:"الإدارة العليا", chipO:"تشغيلي",
+    s1:"مؤشرات تنفيذية", s2:"مؤشرات تشغيلية", s3:"رسوم تفاعلية", s4:"فلاتر وسلايسرز",
+    howTitle:"إزاي تقرأ الداشبورد",
+    h1:"استخدم الفلاتر اللي فوق لاختيار الفترة أو نوع الحملة أو الشركة.",
+    h2:"قف بالماوس على أي رسم هيظهرلك Tooltip فيه الإنفاق والعائد و CTR والتحويلات.",
+    h3:"اضغط على أي عمود أو جزء علشان تفلتر الصفحة، واستخدم Reset للمسح.",
+    palTitle:"نظام التصميم · الداتاوي", palHint:"قف على أي لون علشان تشوف اسمه.",
+    foot:"Power BI · أداء الحملات التسويقية",
+    navIntro:"المقدمة", navExec:"الملخص التنفيذي", navDeep:"التحليل التفصيلي",
+    typed:["الإدارة العليا.","مديري الحملات.","قرارات أسرع."],
+    noLink:"ضيف لينك الصفحة من Power BI في جزء CONFIG أول السكريبت.", copied:"تم نسخ "
+  }
+};
+
+const PALETTE = [["black","#00010A"],["abyss","#00071A"],["navy","#01122A"],["navy_panel","#001A38"],["navy_soft","#022140"],
+  ["ocean","#013760"],["deep_blue","#004979"],["royal","#0071BF"],["blue","#0091DC"],["electric","#00ABEF"],["azure","#00D1F3"],
+  ["cyan","#04FBFE"],["aqua","#39F9FC"],["ice","#6FFAFC"],["frost","#91FDFD"],["mist","#CDFAFC"],["white","#FFFFFF"],["",""]];
+
+let lang = localStorage.getItem("eldatawy-lang") || "en";
+const $ = (s, r=document) => r.querySelector(s), $$ = (s, r=document) => [...r.querySelectorAll(s)];
+
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),3200); }
+
+function go(page){
+  const url = CONFIG.pages[page];
+  if(page==="intro" && !url){ window.scrollTo({top:0,behavior:"smooth"}); return; }
+  if(!url){ toast(I18N[lang].noLink); return; }
+  CONFIG.openInNewTab ? window.open(url,"_blank","noopener") : (window.location.href = url);
+}
+$$("[data-page]").forEach(el=>{
+  el.addEventListener("click", e=>{ e.preventDefault(); go(el.dataset.page); });
+  el.addEventListener("keydown", e=>{ if(e.key==="Enter") go(el.dataset.page); });
+  const url = CONFIG.pages[el.dataset.page]; if(url) el.setAttribute("href", url);
+});
+document.addEventListener("keydown", e=>{
+  if(e.target.closest("input,textarea")) return;
+  if(e.key==="1") go("executive"); if(e.key==="2") go("deepdive");
+});
+
+/* language toggle */
+function applyLang(l){
+  lang=l; localStorage.setItem("eldatawy-lang",l);
+  document.documentElement.lang=l; document.documentElement.dir = l==="ar" ? "rtl" : "ltr";
+  $$("[data-i18n]").forEach(el=>{ const v=I18N[l][el.dataset.i18n]; if(typeof v==="string") el.textContent=v; });
+  $("#btnEN").classList.toggle("on", l==="en"); $("#btnAR").classList.toggle("on", l==="ar");
+  typer.reset();
+}
+$("#btnEN").onclick=()=>applyLang("en"); $("#btnAR").onclick=()=>applyLang("ar");
+
+/* typewriter */
+const typer = (()=>{ let i=0,j=0,del=false,h; const el=$("#typed");
+  function tick(){ const words=I18N[lang].typed, w=words[i%words.length];
+    el.textContent=w.slice(0,j); if(!del&&j<w.length) j++; else if(!del){del=true;h=setTimeout(tick,1400);return;}
+    else if(j>0) j--; else {del=false;i++;}
+    h=setTimeout(tick, del?40:75); }
+  return { start:tick, reset(){ clearTimeout(h); i=0;j=0;del=false; tick(); } };
+})();
+
+/* counters */
+function countUp(){ $$("[data-count]").forEach(el=>{ const to=+el.dataset.count, t0=performance.now();
+  (function f(t){ const p=Math.min((t-t0)/1200,1); el.textContent=Math.round(to*(1-Math.pow(1-p,3))); if(p<1) requestAnimationFrame(f); })(t0); }); }
+
+/* reveal + spotlight */
+$$(".card").forEach((c,k)=>{ setTimeout(()=>c.classList.add("in"), 250+k*160);
+  c.addEventListener("mousemove", e=>{ const r=c.getBoundingClientRect(), s=$(".spot",c); s.style.left=(e.clientX-r.left)+"px"; s.style.top=(e.clientY-r.top)+"px"; }); });
+
+/* palette */
+const sw=$("#swatches");
+PALETTE.filter(p=>p[0]).forEach(([n,h])=>{ const d=document.createElement("div"); d.className="sw"; d.style.background=h; d.title=n+" "+h;
+  d.onmouseenter=()=>$("#swname").textContent=n+"  ·  "+h;
+  d.onclick=()=>{ navigator.clipboard && navigator.clipboard.writeText(h); toast(I18N[lang].copied+h); };
+  sw.appendChild(d); });
+
+/* clock */
+function clock(){ $("#clock").textContent=new Date().toLocaleString(lang==="ar"?"ar-EG":"en-US",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}); }
+setInterval(clock,30000);
+
+/* particle network background */
+(()=>{ const cv=$("#net"), ctx=cv.getContext("2d"); let W,H,P=[];
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function size(){ W=cv.width=innerWidth*devicePixelRatio; H=cv.height=innerHeight*devicePixelRatio; cv.style.width=innerWidth+"px"; cv.style.height=innerHeight+"px";
+    const n=Math.min(90, Math.floor(innerWidth*innerHeight/16000));
+    P=Array.from({length:n},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,r:Math.random()*1.6+.6})); }
+  function draw(){ ctx.clearRect(0,0,W,H); const L=140*devicePixelRatio;
+    for(const p of P){ p.x+=p.vx; p.y+=p.vy; if(p.x<0||p.x>W) p.vx*=-1; if(p.y<0||p.y>H) p.vy*=-1;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r*devicePixelRatio,0,7); ctx.fillStyle="rgba(4,251,254,.55)"; ctx.fill(); }
+    for(let a=0;a<P.length;a++) for(let b=a+1;b<P.length;b++){ const dx=P[a].x-P[b].x, dy=P[a].y-P[b].y, d=Math.hypot(dx,dy);
+      if(d<L){ ctx.strokeStyle=`rgba(0,171,239,${(1-d/L)*.25})`; ctx.lineWidth=devicePixelRatio*.7; ctx.beginPath(); ctx.moveTo(P[a].x,P[a].y); ctx.lineTo(P[b].x,P[b].y); ctx.stroke(); } }
+    if(!reduce) requestAnimationFrame(draw); }
+  addEventListener("resize", size); size(); draw(); })();
+
+applyLang(lang); clock(); countUp();
+</script>
+</body>
+</html>
