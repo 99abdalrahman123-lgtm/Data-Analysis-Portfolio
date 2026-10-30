@@ -58,4 +58,4 @@ A two-page Excel dashboard that explains **why employees leave and what it costs
 
 ## 👤 Author
 
-**Omar Sherif** · *Eldatawy – Data Wizard*
+**Abdalrahman Sherif** · *Eldatawy – Data Wizard*
