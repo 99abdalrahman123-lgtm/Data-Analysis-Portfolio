@@ -57,5 +57,5 @@ Marketing budgets were spread across **5 companies, 6 channels and 5 campaign ty
 
 ## 👤 Author
 
-**Omar Sherif** · *Eldatawy – Data Wizard*
+**Abdalrahman Sherif** · *Eldatawy – Data Wizard*
 Data Analyst · Power BI Developer
