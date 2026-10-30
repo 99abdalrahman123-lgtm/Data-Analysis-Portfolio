@@ -52,4 +52,4 @@ An interactive Excel dashboard that tracks a coffee shop's **3,421 transactions 
 
 ## 👤 Author
 
-**Omar Sherif** · *Eldatawy – Data Wizard*
+**Abdalrahman Sherif** · *Eldatawy – Data Wizard*
